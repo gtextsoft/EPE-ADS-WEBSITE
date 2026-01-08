@@ -256,18 +256,18 @@ h3 {
     overflow: hidden;
     box-shadow: 0 30px 60px rgba(0,0,0,0.5);
     border: 1px solid rgba(255,255,255,0.1);
-    cursor: pointer;
 }
 
 .video-thumb {
     width: 100%;
     aspect-ratio: 16/9;
-    object-fit: cover;
+    display: block;
+    border: none;
     transition: var(--transition-slow);
 }
 
 .video-placeholder:hover .video-thumb {
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 
 .play-btn-overlay {
