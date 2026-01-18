@@ -863,30 +863,29 @@
                                         <h4>SARDIUS FARM CITY ESTATE</h4>
                                         <p><span style="font-size: 20px;">Own Verified Land in Epe's Fastest-Growing Corridor</span></p>
                                     </div>
-                                    <form class="ml-block-form" action="https://formspree.io/f/xvzzklon" data-code="" method="post" target="_blank">
+                                    <form id="contact-form" class="ml-block-form" action="https://formspree.io/f/xvzzklon" method="post">
                                         <div class="ml-form-formContent">
                                             <div class="ml-form-fieldRow">
                                                 <div class="ml-field-group ml-field-email ml-validate-email ml-validate-required">
-                                                    <input aria-label="email" aria-required="true" type="email" class="form-control" data-inputmask="" name="fields[email]" placeholder="Email" autocomplete="email">
+                                                    <input aria-label="email" aria-required="true" type="email" class="form-control" data-inputmask="" name="email" placeholder="Email" autocomplete="email" required>
                                                 </div>
                                             </div>
                                             <div class="ml-form-fieldRow">
                                                 <div class="ml-field-group ml-field-name ml-validate-required">
-                                                    <input aria-label="name" aria-required="true" type="text" class="form-control" data-inputmask="" name="fields[name]" placeholder="Name" autocomplete="given-name">
+                                                    <input aria-label="name" aria-required="true" type="text" class="form-control" data-inputmask="" name="name" placeholder="Name" autocomplete="given-name" required>
                                                 </div>
                                             </div>
                                             <div class="ml-form-fieldRow">
                                                 <div class="ml-field-group ml-field-phone ml-validate-required">
-                                                    <input aria-label="phone" aria-required="true" type="text" class="form-control" data-inputmask="" name="fields[phone]" placeholder="Phone" autocomplete="">
+                                                    <input aria-label="phone" aria-required="true" type="text" class="form-control" data-inputmask="" name="phone" placeholder="Phone" autocomplete="tel" required>
                                                 </div>
                                             </div>
                                             <div class="ml-form-fieldRow ml-last-item">
                                                 <div class="ml-field-group ml-field-state ml-validate-required">
-                                                    <input aria-label="state" aria-required="true" type="text" class="form-control" data-inputmask="" name="fields[state]" placeholder="State" autocomplete="">
+                                                    <input aria-label="state" aria-required="true" type="text" class="form-control" data-inputmask="" name="state" placeholder="State" autocomplete="" required>
                                                 </div>
                                             </div>
                                         </div>
-                                        <input type="hidden" name="ml-submit" value="1">
                                         <div class="ml-form-embedSubmit">
                                             <button type="submit" class="primary">Speak With an Advisor Now</button>
                                             <button disabled="disabled" style="display: none;" type="button" class="loading">
@@ -894,7 +893,6 @@
                                                 <span class="sr-only">Loading...</span>
                                             </button>
                                         </div>
-                                        <input type="hidden" name="anticsrf" value="true">
                                     </form>
                                 </div>
                                 <div class="ml-form-successBody row-success" style="display: none">
@@ -929,17 +927,73 @@
 
     <script src="main.js"></script>
     
-    <!-- MailerLite Form Scripts -->
+    <!-- Formspree Form Handler -->
     <script>
-        function ml_webform_success_35503646() {
-            var $ = ml_jQuery || jQuery;
-            $('.ml-subscribe-form-35503646 .row-success').show();
-            $('.ml-subscribe-form-35503646 .row-form').hide();
-        }
-    </script>
-    <script src="https://groot.mailerlite.com/js/w/webforms.min.js?v176e10baa5e7ed80d35ae235be3d5024" type="text/javascript"></script>
-    <script>
-        fetch("https://assets.mailerlite.com/jsonp/1684141/forms/176054978932115120/takel")
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('contact-form');
+            if (form) {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    const loadingButton = form.querySelector('button.loading');
+                    const formBody = document.querySelector('.ml-subscribe-form-35503646 .row-form');
+                    const successBody = document.querySelector('.ml-subscribe-form-35503646 .row-success');
+                    
+                    // Show loading state
+                    if (submitButton) submitButton.style.display = 'none';
+                    if (loadingButton) {
+                        loadingButton.style.display = 'block';
+                        loadingButton.disabled = false;
+                    }
+                    
+                    const formData = new FormData(form);
+                    
+                    try {
+                        console.log('Submitting to Formspree:', form.action);
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+                        
+                        console.log('Response status:', response.status);
+                        
+                        if (response.ok) {
+                            // Redirect to WhatsApp link on success
+                            window.location.href = 'https://wa.link/303dll';
+                        } else {
+                            const data = await response.json();
+                            console.error('Formspree error:', data);
+                            if (data.errors) {
+                                alert('Error: ' + data.errors.map(error => error.message).join(', '));
+                            } else {
+                                alert('There was an error submitting the form. Please try again.');
+                            }
+                            // Show submit button again
+                            if (submitButton) submitButton.style.display = 'block';
+                            if (loadingButton) {
+                                loadingButton.style.display = 'none';
+                                loadingButton.disabled = true;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Submission error:', error);
+                        alert('There was an error submitting the form. Please check your connection and try again. Error: ' + error.message);
+                        // Show submit button again
+                        if (submitButton) submitButton.style.display = 'block';
+                        if (loadingButton) {
+                            loadingButton.style.display = 'none';
+                            loadingButton.disabled = true;
+                        }
+                    }
+                }, true); // Use capture phase to run before other handlers
+            }
+        });
     </script>
 </body>
 
