@@ -16,52 +16,123 @@ document.addEventListener('DOMContentLoaded', () => {
         revealObserver.observe(element);
     });
 
-    // Form submission handling
-    const leadForm = document.getElementById('leadForm');
+    // WhatsApp redirect function
+    function redirectToWhatsApp(formData) {
+        const name = formData.get('fullName') || '';
+        const country = formData.get('country') || '';
+        const whatsapp = formData.get('whatsapp') || '';
+        const investment = formData.get('investmentOption') || '';
+        const timeline = formData.get('timeline') || '';
 
-    if (leadForm) {
-        leadForm.addEventListener('submit', (e) => {
+        // Prefilled message (exact format as specified)
+        const message = encodeURIComponent(
+            `Hello, I just registered interest in Sardius Farm City Estate (Epe Prelaunch). Please share the full breakdown and next steps.`
+        );
+
+        // WhatsApp link - using wa.link format (update with your actual link)
+        // Alternative: use direct WhatsApp number format: https://wa.me/2348123456789?text=...
+        const whatsappUrl = `https://wa.link/303dll?text=${message}`;
+
+        // Redirect to WhatsApp
+        window.location.href = whatsappUrl;
+    }
+
+    // Form submission handler
+    function handleFormSubmit(form, formId) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const submitBtn = leadForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
 
-            // Basic UI feedback
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Processing...';
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'Processing...';
 
-            // Simulate form submission
-            setTimeout(() => {
-                leadForm.innerHTML = `
-                    <div style="text-align: center; padding: 2rem;">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
-                        <h3 style="margin-bottom: 1rem;">Thank You, ${document.getElementById('fullName').value}!</h3>
-                        <p>Your details have been received. A property advisor will contact you shortly via WhatsApp or phone.</p>
-                        <button onclick="location.reload()" class="btn btn-primary" style="margin-top: 2rem;">Return</button>
-                    </div>
-                `;
-            }, 1500);
+            const formData = new FormData(form);
 
-            // In a real scenario, you would use fetch() here to send to a backend or MailerLite
-            /*
-            const formData = new FormData(leadForm);
-            fetch('/your-endpoint', {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                // handle success
-            });
-            */
+            try {
+                // Optional: Send to Formspree or your backend
+                // Uncomment and update the endpoint if you want to store submissions
+                /*
+                const response = await fetch('https://formspree.io/f/xvzzklon', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Form submission failed');
+                }
+                */
+
+                // Small delay for UX
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Redirect to WhatsApp
+                redirectToWhatsApp(formData);
+
+            } catch (error) {
+                console.error('Form submission error:', error);
+                
+                // Even if backend fails, still redirect to WhatsApp
+                redirectToWhatsApp(formData);
+            }
         });
+    }
+
+    // Handle early form
+    const earlyForm = document.getElementById('early-form-element');
+    if (earlyForm) {
+        handleFormSubmit(earlyForm, 'early-form');
+    }
+
+    // Handle main form
+    const mainForm = document.getElementById('main-form-element');
+    if (mainForm) {
+        handleFormSubmit(mainForm, 'main-form');
     }
 
     // Smooth scroll for anchors
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href === '#') return;
+            
             e.preventDefault();
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
+            const target = document.querySelector(href);
+            if (target) {
+                const headerOffset = 80;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
         });
     });
+
+    // Hide sticky CTA when user is at the form section
+    const stickyCTA = document.querySelector('.sticky-cta-mobile');
+    const mainFormSection = document.getElementById('main-form');
+    
+    if (stickyCTA && mainFormSection) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    stickyCTA.style.display = 'none';
+                } else {
+                    stickyCTA.style.display = 'block';
+                }
+            });
+        }, {
+            threshold: 0.3
+        });
+
+        observer.observe(mainFormSection);
+    }
 });
