@@ -51,7 +51,7 @@
             <div class="container hero-content">
                 <div class="hero-text-box fade-in">
                     <span class="badge">PRELAUNCH • 50% DISCOUNT • SECURE PROCESS</span>
-                    <h1>Own Verified Land in Epe's <br><span class="text-accent">Fastest-Growing Corridor</span></h1>
+                    <h1>A Structured Epe Estate <br><span class="text-accent">Designed for Nigerians Abroad</span></h1>
                     <p class="hero-description">
                         Sardius Farm City Estate: A structured, gated, eco-smart planned estate designed for Nigerians abroad who want clarity, documentation guidance, and a clear acquisition process.
                     </p>
@@ -499,6 +499,61 @@
     <!-- Sticky Mobile CTA -->
     <div class="sticky-cta-mobile">
         <a href="#main-form" class="btn btn-accent btn-full">Get Prelaunch Details</a>
+    </div>
+
+    <!-- Popup Form Modal -->
+    <div id="popup-modal" class="popup-modal">
+        <div class="popup-overlay"></div>
+        <div class="popup-content">
+            <button class="popup-close" aria-label="Close popup">&times;</button>
+            <div class="popup-header">
+                <h3>Get Prelaunch Details</h3>
+                <p>50% discount available now. Get the full breakdown.</p>
+            </div>
+            <form id="popup-form" class="popup-form">
+                <div class="form-group">
+                    <label for="popup-name">Full Name *</label>
+                    <input type="text" id="popup-name" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="popup-country">Country of Residence *</label>
+                    <select id="popup-country" name="country" required>
+                        <option value="">Select country</option>
+                        <option value="UK">United Kingdom</option>
+                        <option value="US">United States</option>
+                        <option value="Canada">Canada</option>
+                        <option value="UAE">United Arab Emirates</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="popup-whatsapp">WhatsApp Number *</label>
+                    <input type="tel" id="popup-whatsapp" name="whatsapp" placeholder="+44 7700 900000" required>
+                </div>
+                <div class="form-group">
+                    <label for="popup-investment">Investment Option *</label>
+                    <select id="popup-investment" name="investmentOption" required>
+                        <option value="">Select option</option>
+                        <option value="Outright">Outright (₦12M)</option>
+                        <option value="Installment">Installment (₦15M)</option>
+                        <option value="Mini-estate">Mini-estate (₦10M/plot)</option>
+                        <option value="Not sure">Not sure yet</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="popup-timeline">Timeline *</label>
+                    <select id="popup-timeline" name="timeline" required>
+                        <option value="">Select timeline</option>
+                        <option value="Just researching">Just researching</option>
+                        <option value="0-3 months">0-3 months</option>
+                        <option value="3-6 months">3-6 months</option>
+                        <option value="6-12 months">6-12 months</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-accent btn-full">Get Prelaunch Details</button>
+                <p class="form-note">No spam. We'll send details via WhatsApp.</p>
+            </form>
+        </div>
     </div>
 
     <script src="main.js"></script>

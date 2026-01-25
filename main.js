@@ -135,4 +135,116 @@ document.addEventListener('DOMContentLoaded', () => {
 
         observer.observe(mainFormSection);
     }
+
+    // Popup Modal Functionality
+    const popupModal = document.getElementById('popup-modal');
+    const popupClose = document.querySelector('.popup-close');
+    const popupOverlay = document.querySelector('.popup-overlay');
+    const popupForm = document.getElementById('popup-form');
+    let popupTimer = null;
+    let formSubmitted = false;
+
+    // Function to show popup
+    function showPopup() {
+        if (!formSubmitted && popupModal) {
+            popupModal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+    }
+
+    // Function to hide popup
+    function hidePopup() {
+        if (popupModal) {
+            popupModal.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+            
+            // Reset form if not submitted
+            if (popupForm && !formSubmitted) {
+                popupForm.reset();
+            }
+        }
+    }
+
+    // Function to schedule next popup (repeatedly)
+    function scheduleNextPopup() {
+        if (!formSubmitted) {
+            popupTimer = setTimeout(() => {
+                showPopup();
+            }, 5000); // 5 seconds
+        }
+    }
+
+    // Close popup handlers
+    if (popupClose) {
+        popupClose.addEventListener('click', () => {
+            hidePopup();
+            scheduleNextPopup(); // Schedule next popup after 5 seconds
+        });
+    }
+
+    if (popupOverlay) {
+        popupOverlay.addEventListener('click', () => {
+            hidePopup();
+            scheduleNextPopup(); // Schedule next popup after 5 seconds
+        });
+    }
+
+    // Handle popup form submission
+    if (popupForm) {
+        popupForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const submitButton = popupForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.textContent = 'Processing...';
+
+            const formData = new FormData(popupForm);
+
+            try {
+                // Small delay for UX
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Mark as submitted to prevent future popups
+                formSubmitted = true;
+                
+                // Clear any pending timers
+                if (popupTimer) {
+                    clearTimeout(popupTimer);
+                }
+
+                // Hide popup
+                hidePopup();
+
+                // Redirect to WhatsApp
+                redirectToWhatsApp(formData);
+
+            } catch (error) {
+                console.error('Form submission error:', error);
+                
+                // Even if there's an error, redirect to WhatsApp
+                formSubmitted = true;
+                if (popupTimer) {
+                    clearTimeout(popupTimer);
+                }
+                hidePopup();
+                redirectToWhatsApp(formData);
+            }
+        });
+    }
+
+    // Initial popup after 5 seconds
+    popupTimer = setTimeout(() => {
+        showPopup();
+    }, 5000);
+
+    // Close popup on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && popupModal && popupModal.classList.contains('active')) {
+            hidePopup();
+            scheduleNextPopup();
+        }
+    });
 });
