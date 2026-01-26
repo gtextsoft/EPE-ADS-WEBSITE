@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!formSubmitted) {
             popupTimer = setTimeout(() => {
                 showPopup();
-            }, 5000); // 5 seconds
+            }, 30000); // 30 seconds
         }
     }
 
@@ -178,14 +178,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (popupClose) {
         popupClose.addEventListener('click', () => {
             hidePopup();
-            scheduleNextPopup(); // Schedule next popup after 5 seconds
+            scheduleNextPopup(); // Schedule next popup after 30 seconds
         });
     }
 
     if (popupOverlay) {
         popupOverlay.addEventListener('click', () => {
             hidePopup();
-            scheduleNextPopup(); // Schedule next popup after 5 seconds
+            scheduleNextPopup(); // Schedule next popup after 30 seconds
         });
     }
 
@@ -235,10 +235,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initial popup after 5 seconds
+    // Initial popup after 30 seconds
     popupTimer = setTimeout(() => {
         showPopup();
-    }, 5000);
+    }, 30000);
 
     // Close popup on Escape key
     document.addEventListener('keydown', (e) => {
