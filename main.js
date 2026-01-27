@@ -47,14 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Show loading state
             submitButton.disabled = true;
-            submitButton.textContent = 'Processing...';
+            submitButton.textContent = 'Submitting...';
 
             const formData = new FormData(form);
 
             try {
-                // Optional: Send to Formspree or your backend
-                // Uncomment and update the endpoint if you want to store submissions
-                /*
+                // Submit to Formspree first
                 const response = await fetch('https://formspree.io/f/xvzzklon', {
                     method: 'POST',
                     body: formData,
@@ -64,21 +62,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error('Form submission failed');
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Form submission failed');
                 }
-                */
 
-                // Small delay for UX
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // Show success message briefly
+                submitButton.textContent = 'Success! Redirecting...';
+                await new Promise(resolve => setTimeout(resolve, 1000));
 
-                // Redirect to WhatsApp
+                // Redirect to WhatsApp after successful submission
                 redirectToWhatsApp(formData);
 
             } catch (error) {
                 console.error('Form submission error:', error);
                 
-                // Even if backend fails, still redirect to WhatsApp
-                redirectToWhatsApp(formData);
+                // Show error message
+                submitButton.textContent = 'Error. Try again?';
+                submitButton.disabled = false;
+                
+                // Still redirect to WhatsApp even if backend fails
+                setTimeout(() => {
+                    submitButton.textContent = originalText;
+                    redirectToWhatsApp(formData);
+                }, 2000);
             }
         });
     }
@@ -199,13 +205,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Show loading state
             submitButton.disabled = true;
-            submitButton.textContent = 'Processing...';
+            submitButton.textContent = 'Submitting...';
 
             const formData = new FormData(popupForm);
 
             try {
-                // Small delay for UX
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // Submit to Formspree first
+                const response = await fetch('https://formspree.io/f/xvzzklon', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Form submission failed');
+                }
 
                 // Mark as submitted to prevent future popups
                 formSubmitted = true;
@@ -215,22 +232,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     clearTimeout(popupTimer);
                 }
 
+                // Show success message briefly
+                submitButton.textContent = 'Success! Redirecting...';
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
                 // Hide popup
                 hidePopup();
 
-                // Redirect to WhatsApp
+                // Redirect to WhatsApp after successful submission
                 redirectToWhatsApp(formData);
 
             } catch (error) {
                 console.error('Form submission error:', error);
                 
-                // Even if there's an error, redirect to WhatsApp
-                formSubmitted = true;
-                if (popupTimer) {
-                    clearTimeout(popupTimer);
-                }
-                hidePopup();
-                redirectToWhatsApp(formData);
+                // Show error message
+                submitButton.textContent = 'Error. Try again?';
+                submitButton.disabled = false;
+                
+                // Still redirect to WhatsApp even if backend fails
+                setTimeout(() => {
+                    formSubmitted = true;
+                    if (popupTimer) {
+                        clearTimeout(popupTimer);
+                    }
+                    hidePopup();
+                    redirectToWhatsApp(formData);
+                }, 2000);
             }
         });
     }
