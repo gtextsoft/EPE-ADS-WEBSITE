@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(form);
 
             try {
-                // Submit to Formspree first
+                // Submit to Formspree first - wait for complete submission
                 const response = await fetch('https://formspree.io/f/xvzzklon', {
                     method: 'POST',
                     body: formData,
@@ -61,17 +61,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
+                // Wait for response to be fully received
+                const responseData = await response.json();
+
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Form submission failed');
+                    throw new Error(responseData.error || 'Form submission failed');
                 }
 
-                // Show success message briefly
-                submitButton.textContent = 'Success! Redirecting...';
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Verify submission was successful
+                if (responseData && (responseData.ok === true || responseData.success === true || response.status === 200)) {
+                    // Show success message briefly
+                    submitButton.textContent = 'Success! Redirecting...';
+                    await new Promise(resolve => setTimeout(resolve, 1500));
 
-                // Redirect to WhatsApp after successful submission
-                redirectToWhatsApp(formData);
+                    // Only redirect after successful submission
+                    redirectToWhatsApp(formData);
+                } else {
+                    throw new Error('Form submission was not successful');
+                }
 
             } catch (error) {
                 console.error('Form submission error:', error);
@@ -80,11 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitButton.textContent = 'Error. Try again?';
                 submitButton.disabled = false;
                 
-                // Still redirect to WhatsApp even if backend fails
+                // Don't redirect if submission failed - let user try again
+                // User can manually retry or we can redirect after a longer delay
                 setTimeout(() => {
-                    submitButton.textContent = originalText;
-                    redirectToWhatsApp(formData);
-                }, 2000);
+                    if (submitButton.textContent === 'Error. Try again?') {
+                        submitButton.textContent = originalText;
+                    }
+                }, 3000);
             }
         });
     }
@@ -142,13 +151,13 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(mainFormSection);
     }
 
-    // Popup Modal Functionality
+    // Popup Modal Functionality - DISABLED
     const popupModal = document.getElementById('popup-modal');
     const popupClose = document.querySelector('.popup-close');
     const popupOverlay = document.querySelector('.popup-overlay');
     const popupForm = document.getElementById('popup-form');
     let popupTimer = null;
-    let formSubmitted = false;
+    let formSubmitted = true; // Set to true to disable popup
 
     // Function to show popup
     function showPopup() {
@@ -180,20 +189,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Close popup handlers
-    if (popupClose) {
-        popupClose.addEventListener('click', () => {
-            hidePopup();
-            scheduleNextPopup(); // Schedule next popup after 30 seconds
-        });
-    }
+    // Close popup handlers - DISABLED
+    // if (popupClose) {
+    //     popupClose.addEventListener('click', () => {
+    //         hidePopup();
+    //         scheduleNextPopup(); // Schedule next popup after 30 seconds
+    //     });
+    // }
 
-    if (popupOverlay) {
-        popupOverlay.addEventListener('click', () => {
-            hidePopup();
-            scheduleNextPopup(); // Schedule next popup after 30 seconds
-        });
-    }
+    // if (popupOverlay) {
+    //     popupOverlay.addEventListener('click', () => {
+    //         hidePopup();
+    //         scheduleNextPopup(); // Schedule next popup after 30 seconds
+    //     });
+    // }
 
     // Handle popup form submission
     if (popupForm) {
@@ -210,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(popupForm);
 
             try {
-                // Submit to Formspree first
+                // Submit to Formspree first - wait for complete submission
                 const response = await fetch('https://formspree.io/f/xvzzklon', {
                     method: 'POST',
                     body: formData,
@@ -219,28 +228,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
+                // Wait for response to be fully received
+                const responseData = await response.json();
+
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Form submission failed');
+                    throw new Error(responseData.error || 'Form submission failed');
                 }
 
-                // Mark as submitted to prevent future popups
-                formSubmitted = true;
-                
-                // Clear any pending timers
-                if (popupTimer) {
-                    clearTimeout(popupTimer);
+                // Verify submission was successful
+                if (responseData && (responseData.ok === true || responseData.success === true || response.status === 200)) {
+                    // Mark as submitted to prevent future popups
+                    formSubmitted = true;
+                    
+                    // Clear any pending timers
+                    if (popupTimer) {
+                        clearTimeout(popupTimer);
+                    }
+
+                    // Show success message briefly
+                    submitButton.textContent = 'Success! Redirecting...';
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Hide popup
+                    hidePopup();
+
+                    // Only redirect after successful submission
+                    redirectToWhatsApp(formData);
+                } else {
+                    throw new Error('Form submission was not successful');
                 }
-
-                // Show success message briefly
-                submitButton.textContent = 'Success! Redirecting...';
-                await new Promise(resolve => setTimeout(resolve, 1000));
-
-                // Hide popup
-                hidePopup();
-
-                // Redirect to WhatsApp after successful submission
-                redirectToWhatsApp(formData);
 
             } catch (error) {
                 console.error('Form submission error:', error);
@@ -249,29 +265,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitButton.textContent = 'Error. Try again?';
                 submitButton.disabled = false;
                 
-                // Still redirect to WhatsApp even if backend fails
+                // Don't redirect if submission failed - let user try again
                 setTimeout(() => {
-                    formSubmitted = true;
-                    if (popupTimer) {
-                        clearTimeout(popupTimer);
+                    if (submitButton.textContent === 'Error. Try again?') {
+                        submitButton.textContent = originalText;
                     }
-                    hidePopup();
-                    redirectToWhatsApp(formData);
-                }, 2000);
+                }, 3000);
             }
         });
     }
 
-    // Initial popup after 30 seconds
-    popupTimer = setTimeout(() => {
-        showPopup();
-    }, 30000);
+    // Initial popup after 30 seconds - DISABLED
+    // popupTimer = setTimeout(() => {
+    //     showPopup();
+    // }, 30000);
 
-    // Close popup on Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && popupModal && popupModal.classList.contains('active')) {
-            hidePopup();
-            scheduleNextPopup();
-        }
-    });
+    // Close popup on Escape key - DISABLED
+    // document.addEventListener('keydown', (e) => {
+    //     if (e.key === 'Escape' && popupModal && popupModal.classList.contains('active')) {
+    //         hidePopup();
+    //         scheduleNextPopup();
+    //     }
+    // });
 });
